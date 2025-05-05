@@ -1,5 +1,5 @@
 [package]
-name = "soroban-groth16-verifier-contract"
+name = "soroban-groth16-verifier-contract-bn254"
 version = "0.0.0"
 edition = "2021"
 publish = false
@@ -9,10 +9,10 @@ crate-type = ["cdylib"]
 doctest = false
 
 [dependencies]
-ark-bn254 = "0.5.0"
-ark-groth16 = "0.5.0"
+ark-bn254 = { version = "0.5.0", default-features = false, features = ["curve"]}
+wee_alloc = "0.4.5"
+ark-groth16 = { version = "0.5.0", default-features = false }
 # soroban-sdk = { version = "22.0.1" }
-# ark-bn254 = "0.5.0"
 soroban-sdk = { git = "https://github.com/jayz22/rs-soroban-sdk.git", rev = "183f527a763ae12611870fd16724b89e5e40ad33" }
 
 [dev-dependencies]
