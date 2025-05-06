@@ -1,0 +1,27 @@
+[package]
+name = "soroban-poseidon-hash-contract"
+version = "0.0.0"
+authors = ["chee!"]
+license = "Apache-2.0"
+edition = "2021"
+publish = false
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+doctest = false
+
+[features]
+default = ["export"]
+export = []
+testutils = ["soroban-sdk/testutils"]
+
+[dependencies]
+# soroban-sdk = "0.0.3"
+soroban-sdk = { git = "https://github.com/jayz22/rs-soroban-sdk.git", rev = "183f527a763ae12611870fd16724b89e5e40ad33" }
+
+bytemuck = { version = "1.12", features = ["derive"] }
+bytemuck_derive = "1.9.3"
+
+
+[dev_dependencies]
+# soroban-sdk = { version = "22.0.1", features = ["testutils"] }
