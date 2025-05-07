@@ -37,6 +37,14 @@ fn test() {
     //         1602459165
     //     ]
     // );
+
+    assert_eq!(
+        res.as_words(),
+        vec![
+            &env, 1924395166, 735702495, 455179170, 55613122, 1240862023, 1674846984, 2009818198,
+            1683428318
+        ]
+    );
     // let res = client.verify_proof(&vk, &proof, &output);
     // assert_eq!(res, true);
     env.cost_estimate().budget().print();
