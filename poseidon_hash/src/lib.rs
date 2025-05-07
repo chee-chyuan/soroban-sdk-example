@@ -29,13 +29,13 @@ impl PoseidonHashContract {
         for elem in both_vec.iter() {
             assert!(elem.is_reduced());
         }
-        let unpadded = unpadded_hash2(both_vec);
+        let unpadded = unpadded_hash(both_vec);
         let digest = to_digest(&env, unpadded);
         digest
     }
 
     pub fn hash_elem_slice(env: Env, slice: Vec<BabyBearElem>) -> Digest {
-        let unpadded = unpadded_hash2(slice);
+        let unpadded = unpadded_hash(slice);
         to_digest(&env, unpadded)
     }
 
@@ -47,13 +47,13 @@ impl PoseidonHashContract {
             }
         }
 
-        let unpadded = unpadded_hash2(elements);
+        let unpadded = unpadded_hash(elements);
         let digest = to_digest(&env, unpadded);
         digest
     }
 }
 
-fn unpadded_hash2(elems: Vec<BabyBearElem>) -> [BabyBearElem; CELLS_OUT] {
+fn unpadded_hash(elems: Vec<BabyBearElem>) -> [BabyBearElem; CELLS_OUT] {
     let mut state = [Elem::new(0); CELLS];
     let mut count = 0;
     let mut unmixed = 0;
@@ -75,3 +75,5 @@ fn unpadded_hash2(elems: Vec<BabyBearElem>) -> [BabyBearElem; CELLS_OUT] {
     }
     state.as_slice()[0..CELLS_OUT].try_into().unwrap()
 }
+
+mod test;
