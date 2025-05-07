@@ -53,6 +53,10 @@ impl Elem {
         }
         *self
     }
+
+    pub fn is_reduced(&self) -> bool {
+        self.0 < P
+    }
 }
 
 impl ops::Add for Elem {

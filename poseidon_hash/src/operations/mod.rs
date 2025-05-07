@@ -11,6 +11,7 @@ pub const CELLS_RATE: usize = 16;
 pub mod elem;
 pub mod ext_elem;
 pub mod poseidon_const;
+pub mod digest;
 
 pub type BabyBearElem = Elem;
 

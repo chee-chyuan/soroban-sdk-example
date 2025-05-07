@@ -1,80 +1,67 @@
-use bytemuck::Zeroable;
-use soroban_sdk::contracttype;
+use soroban_sdk::{contracttype, Env, Vec};
 
 use super::elem::Elem;
 
 const EXT_SIZE: usize = 4;
 
 #[contracttype]
-#[derive(Eq, Clone, Copy, Zeroable)]
-pub struct ExtElem([Elem; EXT_SIZE]);
+#[derive(Clone)]
+pub struct ExtElem(pub Vec<Elem>);
 
 pub type BabyBearExtElem = ExtElem;
 
-const fn const_ensure_valid(x: Elem) -> Elem {
-    // debug_assert!(x.0 != Elem::INVALID.0);
-    if x.0 == Elem::INVALID.0 {
-        panic!("Invalid Baby Bear element");
-    }
-    x
-}
-
 impl ExtElem {
-    const INVALID: Self = ExtElem([Elem::INVALID, Elem::INVALID, Elem::INVALID, Elem::INVALID]);
-    /// Explicitly construct an ExtElem from parts.
-    pub const fn new(x0: Elem, x1: Elem, x2: Elem, x3: Elem) -> Self {
-        Self([
-            const_ensure_valid(x0),
-            const_ensure_valid(x1),
-            const_ensure_valid(x2),
-            const_ensure_valid(x3),
-        ])
+    const INVALID: [Elem; 4] = [Elem::INVALID, Elem::INVALID, Elem::INVALID, Elem::INVALID];
+
+    pub fn new(env: &Env, x0: Elem, x1: Elem, x2: Elem, x3: Elem) -> Self {
+        Self(Vec::from_array(env, [x0, x1, x2, x3]))
     }
 
-    /// Create an [ExtElem] from an [Elem].
-    pub fn from_fp(x: Elem) -> Self {
-        Self([x, Elem::new(0), Elem::new(0), Elem::new(0)])
+    pub fn from_fp(env: &Env, x: Elem) -> Self {
+        Self(Vec::from_array(
+            env,
+            [x, Elem::new(0), Elem::new(0), Elem::new(0)],
+        ))
     }
 
     /// Create an [ExtElem] from a raw integer.
-    pub const fn from_u32(x0: u32) -> Self {
-        Self([Elem::new(x0), Elem::new(0), Elem::new(0), Elem::new(0)])
+    pub fn from_u32(env: &Env, x0: u32) -> Self {
+        Self(Vec::from_array(
+            env,
+            [Elem::new(x0), Elem::new(0), Elem::new(0), Elem::new(0)],
+        ))
     }
 
     /// Return the value zero.
-    const fn zero() -> Self {
-        Self::from_u32(0)
+    fn zero(env: &Env) -> Self {
+        Self::from_u32(env, 0)
     }
 
     /// Return the value one.
-    const fn one() -> Self {
-        Self::from_u32(1)
+    fn one(env: &Env) -> Self {
+        Self::from_u32(env, 1)
     }
 
     fn is_valid(&self) -> bool {
-        self.0 != Self::INVALID.0
+        self.0
+            .iter()
+            .zip(Self::INVALID.iter())
+            .all(|(a, b)| a == *b)
     }
 
     fn ensure_valid(&self) -> Self {
         if !self.is_valid() {
             panic!("Invalid Baby Bear element");
         }
-        *self
+        self.clone()
     }
 
-    /// Return the base field term of an [Elem].
     pub fn const_part(self) -> Elem {
-        self.ensure_valid().0[0]
+        self.ensure_valid().0.get(0).unwrap()
     }
 
     /// Return [Elem] as a vector of base field values.
-    pub fn elems(&self) -> [Elem; EXT_SIZE] {
+    pub fn elems(&self) -> Vec<Elem> {
         self.ensure_valid().0
-    }
-}
-
-impl PartialEq<ExtElem> for ExtElem {
-    fn eq(&self, rhs: &Self) -> bool {
-        self.ensure_valid().0 == rhs.ensure_valid().0
     }
 }
