@@ -1,3 +1,5 @@
+use ark_bn254::Fq;
+use ark_ff::{BigInt, PrimeField};
 use soroban_sdk::{contracttype, Env, Vec};
 
 #[contracttype]
@@ -14,6 +16,19 @@ impl Fp {
         Fp {
             bigint: Vec::from_array(env, Self::ZERO),
         }
+    }
+
+    pub fn to_ark_fp(self) -> Fq {
+        let bigint = BigInt([
+            self.bigint.get(0).unwrap(),
+            self.bigint.get(1).unwrap(),
+            self.bigint.get(2).unwrap(),
+            self.bigint.get(3).unwrap(),
+        ]);
+
+        Fq::from_bigint(bigint).unwrap()
+
+        // pub struct BigInt<const N: usize>(pub [u64; N]);
     }
 }
 
@@ -41,8 +56,6 @@ impl Fp {
 //     /// `R = M % Self::MODULUS`.
 //     const R: BigInt<N> = Self::MODULUS.montgomery_r();
 
-
-
 pub struct RBuffer(pub [u64; Fp::N], pub u64);
 
 impl RBuffer {
@@ -61,7 +74,7 @@ impl RBuffer {
     }
 }
 
-pub struct BigInt(pub [u64; Fp::N]);
+pub struct BigIntSoroban(pub [u64; Fp::N]);
 
 #[macro_export]
 macro_rules! const_for {
@@ -83,7 +96,7 @@ macro_rules! sbb {
     }};
 }
 
-impl BigInt {
+impl BigIntSoroban {
     const fn const_mul2_with_carry(mut self) -> (Self, bool) {
         let mut last = 0;
         const N: usize = Fp::N;

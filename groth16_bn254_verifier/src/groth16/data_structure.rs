@@ -1,3 +1,9 @@
+use ark_bn254::Bn254;
+use ark_ec::models::bn::g2::G2Prepared as ArkG2Prepared;
+use ark_groth16::{
+    Groth16, PreparedVerifyingKey as ArkPreparedVerifyingKey, Proof as ArkProof,
+    VerifyingKey as ArkVerifyingKey,
+};
 use soroban_sdk::{contracttype, Vec};
 
 use crate::{
@@ -23,18 +29,48 @@ pub struct VerifyingKey {
     pub gamma_abc_g1: Vec<G1Affine>,
 }
 
+impl VerifyingKey {
+    pub fn to_ark_vk(&self) -> ArkVerifyingKey<Bn254> {
+        ArkVerifyingKey {
+            alpha_g1: self.alpha_g1.to_ark_g1_affine(),
+            beta_g2: self.beta_g2.to_ark_g2_affine(),
+            gamma_g2: self.gamma_g2.to_ark_g2_affine(),
+            delta_g2: self.delta_g2.to_ark_g2_affine(),
+            gamma_abc_g1: self
+                .gamma_abc_g1
+                .iter()
+                .map(|g1| g1.to_ark_g1_affine())
+                .collect(),
+        }
+    }
+}
+
 #[contracttype]
 pub struct PreparedVerifyingKey {
     /// The unprepared verification key.
     pub vk: VerifyingKey,
     /// The element `e(alpha * G, beta * H)` in `E::GT`.
     pub alpha_g1_beta_g2: TargetField,
-    /// The element `- gamma * H` in `E::G2`, prepared for use in pairings.
-    pub gamma_g2_neg_pc: G2Prepared,
-    /// The element `- delta * H` in `E::G2`, prepared for use in pairings.
-    pub delta_g2_neg_pc: G2Prepared,
+    // /// The element `- gamma * H` in `E::G2`, prepared for use in pairings.
+    // pub gamma_g2_neg_pc: G2Prepared,
+    // /// The element `- delta * H` in `E::G2`, prepared for use in pairings.
+    // pub delta_g2_neg_pc: G2Prepared,
+    pub gamma_g2_neg_pc: G2Affine,
+    pub delta_g2_neg_pc: G2Affine,
 }
 
+impl PreparedVerifyingKey {
+    pub fn to_ark_pvk(&self) -> ArkPreparedVerifyingKey<Bn254> {
+        let gamma_g2_neg_pc = ArkG2Prepared::from(self.gamma_g2_neg_pc.to_ark_g2_affine());
+        let delta_g2_neg_pc = ArkG2Prepared::from(self.delta_g2_neg_pc.to_ark_g2_affine());
+        ArkPreparedVerifyingKey {
+            vk: self.vk.to_ark_vk(),
+            alpha_g1_beta_g2: self.alpha_g1_beta_g2.to_ark_fp12(),
+            gamma_g2_neg_pc,
+            delta_g2_neg_pc,
+        }
+    }
+}
 type TargetField = Fp12;
 
 #[contracttype]
@@ -45,4 +81,14 @@ pub struct Proof {
     pub b: G2Affine,
     /// The `C` element in `G1`.
     pub c: G1Affine,
+}
+
+impl Proof {
+    pub fn to_ark_proof(&self) -> ArkProof<Bn254> {
+        ArkProof {
+            a: self.a.to_ark_g1_affine(),
+            b: self.b.to_ark_g2_affine(),
+            c: self.c.to_ark_g1_affine(),
+        }
+    }
 }
