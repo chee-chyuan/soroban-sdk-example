@@ -43,7 +43,7 @@ pub fn g2_from_bytes(elem: &[std::vec::Vec<std::vec::Vec<u8>>]) -> Result<G2Affi
 }
 
 // Convert the U256 value to a byte array in big-endian format
-pub fn from_u256(value: &str) -> Result<Vec<u8>, Error> {
+pub fn from_u256(value: &str) -> Result<std::vec::Vec<u8>, Error> {
     if let Some(stripped) = value.strip_prefix("0x") {
         from_u256_hex(stripped)
     } else {
@@ -65,7 +65,7 @@ fn from_u256_hex(value: &str) -> Result<std::vec::Vec<u8>, Error> {
     )
 }
 
-fn to_fixed_array(input: Vec<u8>) -> [u8; 32] {
+fn to_fixed_array(input: std::vec::Vec<u8>) -> [u8; 32] {
     let mut fixed_array = [0u8; 32];
     let start = core::cmp::max(32, input.len()) - core::cmp::min(32, input.len());
     fixed_array[start..].copy_from_slice(&input[input.len().saturating_sub(32)..]);

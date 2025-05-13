@@ -12,7 +12,6 @@ use soroban_sdk::{contract, contractimpl};
 mod curves;
 mod fields;
 mod groth16;
-mod helper;
 mod verifier;
 
 // extern crate alloc;

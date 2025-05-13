@@ -2,6 +2,7 @@
 
 use anyhow::{anyhow, Error};
 use ark_bn254::Bn254;
+use core::str::FromStr;
 use serde::{Deserialize, Serialize};
 
 use super::helpers::{from_u256, g1_from_bytes, g2_from_bytes};
@@ -97,5 +98,80 @@ impl VerifyingKeyJson {
             delta_g2,
             gamma_abc_g1,
         })
+    }
+}
+
+/// Compatibility module providing simple serde interop
+mod serde_ark {
+    extern crate alloc;
+    use alloc::vec::Vec;
+
+    use ark_serialize::{CanonicalDeserialize, CanonicalSerialize};
+    use serde::{
+        de::Error as _, ser::Error as _, Deserialize, Deserializer, Serialize, Serializer,
+    };
+
+    pub fn serialize<S>(key: &impl CanonicalSerialize, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut buffer = Vec::<u8>::new();
+        key.serialize_uncompressed(&mut buffer)
+            .map_err(S::Error::custom)?;
+        buffer.serialize(serializer)
+    }
+
+    pub fn deserialize<'de, D, T>(deserializer: D) -> Result<T, D::Error>
+    where
+        D: Deserializer<'de>,
+        T: CanonicalDeserialize,
+    {
+        let buffer = Vec::<u8>::deserialize(deserializer)?;
+        T::deserialize_uncompressed(buffer.as_slice()).map_err(D::Error::custom)
+    }
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct Fr(#[serde(with = "serde_ark")] pub ark_bn254::Fr);
+
+impl Fr {
+    pub fn ark_fr(&self) -> ark_bn254::Fr {
+        self.0
+    }
+}
+
+// impl Digestible for Fr {
+//     /// Compute a tagged hash of the [Fr] value.
+//     fn digest<S: Sha256>(&self) -> Digest {
+//         let mut buffer = Vec::<u8>::with_capacity(32);
+//         // Serialization into a pre-allocated buffer should never fail.
+//         self.0.serialize_uncompressed(&mut buffer).unwrap();
+//         // Convert to big-endian representation.
+//         buffer.reverse();
+//         tagged_struct::<S>(
+//             "risc0_groth16.Fr",
+//             &[bytemuck::pod_read_unaligned::<Digest>(&buffer)],
+//             &[],
+//         )
+//     }
+// }
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct PublicInputsJson {
+    /// values of the public witness
+    pub values: std::vec::Vec<std::string::String>,
+}
+
+impl PublicInputsJson {
+    /// Converts public inputs to scalars over the field of the G1/G2 groups.
+    pub fn to_scalar(&self) -> Result<std::vec::Vec<Fr>, Error> {
+        self.values
+            .iter()
+            .map(|input| {
+                ark_bn254::Fr::from_str(input)
+                    .map(Fr)
+                    .map_err(|_| anyhow!("Failed to decode 'public inputs' values"))
+            })
+            .collect()
     }
 }
