@@ -14,6 +14,15 @@ mod groth16;
 mod helper;
 mod verifier;
 
+
+// extern crate alloc;
+
+extern crate wee_alloc;
+
+// Use `wee_alloc` as the global allocator.
+#[global_allocator]
+static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
+
 #[contract]
 pub struct Groth16BN254Verifier;
 
