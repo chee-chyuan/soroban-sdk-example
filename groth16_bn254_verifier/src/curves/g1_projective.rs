@@ -1,5 +1,5 @@
 use ark_bn254::G1Projective as ArkG1Projective;
-use soroban_sdk::contracttype;
+use soroban_sdk::{contracttype, Env};
 
 use crate::fields::fp::Fp;
 

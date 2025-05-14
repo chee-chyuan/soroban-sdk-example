@@ -7,7 +7,13 @@ use ark_serialize::{CanonicalDeserialize, CanonicalSerialize};
 use risc0_groth16::{ProofJson, Seal};
 use soroban_sdk::Env;
 
-use crate::{Groth16BN254Verifier, Groth16BN254VerifierClient};
+use crate::{
+    curves::g1_projective::G1Projective as G1ProjectiveSoroban,
+    groth16::data_structure::{
+        PreparedVerifyingKey as SorobanPreparedVerifyingKey, Proof as SorobanProof,
+    },
+    Groth16BN254Verifier, Groth16BN254VerifierClient,
+};
 
 use super::{
     data_structures::{PublicInputsJson, VerifyingKeyJson},
@@ -80,24 +86,30 @@ fn test_verify() {
         .map_err(|err| anyhow!(err))
         .unwrap();
     let prepared_inputs =
-        &G1Projective::deserialize_uncompressed(encoded_prepared_inputs.as_slice())
+        G1Projective::deserialize_uncompressed(encoded_prepared_inputs.as_slice())
             .map_err(|err| anyhow!(err))
             .unwrap();
 
+    // conversion
+    let env = Env::default();
+    let pvk_soroban = SorobanPreparedVerifyingKey::from_ark_pvk(&env, pvk);
+    let proof_soroban = SorobanProof::from_ark_proof(&env, proof);
+    let prepared_inputs_soroban =
+        G1ProjectiveSoroban::from_ark_g1_projective(&env, prepared_inputs);
+
     // start test
 
-    let env = Env::default();
     env.cost_estimate().budget().reset_unlimited();
 
     let client = create_client(&env);
     env.cost_estimate().budget().reset_default();
-    // let res = client.verify_with_prepared_inputs(&vk, &proof, &output);
-    // assert_eq!(res, true);
-    // env.cost_estimate().budget().print();
+    let res =
+        client.verify_with_prepared_inputs(&pvk_soroban, &proof_soroban, &prepared_inputs_soroban);
+    assert_eq!(res, true);
+    env.cost_estimate().budget().print();
 }
 
 // pub fn verify_with_prepared_inputs(
 //     pvk_soroban: PreparedVerifyingKeySoroban,
 //     proof_soroban: ProofSoroban,
 //     prepared_inputs_soroban: G1ProjectiveSoroban,
-

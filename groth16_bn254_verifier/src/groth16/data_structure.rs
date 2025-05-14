@@ -1,4 +1,4 @@
-use ark_bn254::Bn254;
+use ark_bn254::{Bn254, G2Affine as ArkG2Affine};
 use ark_ec::models::bn::g2::G2Prepared as ArkG2Prepared;
 use ark_groth16::{
     Groth16, PreparedVerifyingKey as ArkPreparedVerifyingKey, Proof as ArkProof,
@@ -76,30 +76,33 @@ pub struct PreparedVerifyingKey {
     // pub gamma_g2_neg_pc: G2Prepared,
     // /// The element `- delta * H` in `E::G2`, prepared for use in pairings.
     // pub delta_g2_neg_pc: G2Prepared,
-    pub gamma_g2_neg_pc: G2Affine,
-    pub delta_g2_neg_pc: G2Affine,
+    pub gamma_g2_neg_pc: G2Prepared,
+    pub delta_g2_neg_pc: G2Prepared,
 }
 
 impl PreparedVerifyingKey {
     pub fn to_ark_pvk(&self) -> ArkPreparedVerifyingKey<Bn254> {
-        let gamma_g2_neg_pc = ArkG2Prepared::from(self.gamma_g2_neg_pc.to_ark_g2_affine());
-        let delta_g2_neg_pc = ArkG2Prepared::from(self.delta_g2_neg_pc.to_ark_g2_affine());
+        // let gamma_g2_neg_pc = ArkG2Prepared::from(self.gamma_g2_neg_pc.to_ark_g2_affine());
+        // let delta_g2_neg_pc = ArkG2Prepared::from(self.delta_g2_neg_pc.to_ark_g2_affine());
         ArkPreparedVerifyingKey {
             vk: self.vk.to_ark_vk(),
             alpha_g1_beta_g2: self.alpha_g1_beta_g2.to_ark_fp12(),
-            gamma_g2_neg_pc,
-            delta_g2_neg_pc,
+            gamma_g2_neg_pc: self.gamma_g2_neg_pc.to_ark_g2_prepared(),
+            delta_g2_neg_pc: self.delta_g2_neg_pc.to_ark_g2_prepared(),
         }
     }
 
-    // pub fn from_ark_pvk(env: &Env, pvk: ArkPreparedVerifyingKey<Bn254>) -> Self {
-    //     PreparedVerifyingKey {
-    //         vk: VerifyingKey::from_ark_vk(env, pvk.vk),
-    //         alpha_g1_beta_g2: Fp12::from_ark_fp12(env, pvk.alpha_g1_beta_g2),
-    //         gamma_g2_neg_pc: G2Affine::from_ark_g2_affine(env, pvk.gamma_g2_neg_pc),
-    //         delta_g2_neg_pc: G2Affine::from_ark_g2_affine(env, pvk.delta_g2_neg_pc),
-    //     }
-    // }
+    pub fn from_ark_pvk(env: &Env, pvk: ArkPreparedVerifyingKey<Bn254>) -> Self {
+        // let gamma_g2_neg_pc_prepared = pvk.gamma_g2_neg_pc;
+        // let gamma_g2_neg_pc = ArkG2Affine::from(gamma_g2_neg_pc_prepared);
+
+        PreparedVerifyingKey {
+            vk: VerifyingKey::from_ark_vk(env, pvk.vk),
+            alpha_g1_beta_g2: Fp12::from_ark_fp12(env, pvk.alpha_g1_beta_g2),
+            gamma_g2_neg_pc: G2Prepared::from_ark_g2_prepared(env, pvk.gamma_g2_neg_pc),
+            delta_g2_neg_pc: G2Prepared::from_ark_g2_prepared(env, pvk.delta_g2_neg_pc),
+        }
+    }
 }
 type TargetField = Fp12;
 
@@ -119,6 +122,14 @@ impl Proof {
             a: self.a.to_ark_g1_affine(),
             b: self.b.to_ark_g2_affine(),
             c: self.c.to_ark_g1_affine(),
+        }
+    }
+
+    pub fn from_ark_proof(env: &Env, proof: ArkProof<Bn254>) -> Self {
+        Proof {
+            a: G1Affine::from_ark_g1_affine(env, proof.a),
+            b: G2Affine::from_ark_g2_affine(env, proof.b),
+            c: G1Affine::from_ark_g1_affine(env, proof.c),
         }
     }
 }
