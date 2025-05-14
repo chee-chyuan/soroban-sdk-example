@@ -34,7 +34,6 @@ fn create_client(e: &Env) -> Groth16VerifierClient {
 #[test]
 fn test() {
     let env = Env::default();
-    env.cost_estimate().budget().reset_unlimited();
     // verification key (copied from './data/multiplier2_js/verification_key.json')
     let alphax = "851850525556173310373115880154698084608631105506432893865500290442025919078535925294035153152030470398262539759609";
     let alphay = "2637289349983507610125993281171282870664683328789064436670091381805667870657250691837988574635646688089951719927247";
@@ -91,6 +90,7 @@ fn test() {
 
     let output = Vec::from_array(&env, [Fr::from_u256(U256::from_u32(&env, 33))]);
 
+    env.cost_estimate().budget().reset_unlimited();
     let client = create_client(&env);
     env.cost_estimate().budget().reset_default();
     let res = client.verify_proof(&vk, &proof, &output);
