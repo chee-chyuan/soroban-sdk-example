@@ -28,4 +28,11 @@ impl Fp {
 
         Fq::from_bigint(bigint).unwrap()
     }
+
+    pub fn from_ark_fp(env: &Env, fp: Fq) -> Self {
+        let bigint = fp.into_bigint();
+        Fp {
+            bigint: Vec::from_array(env, bigint.0),
+        }
+    }
 }

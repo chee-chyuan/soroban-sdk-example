@@ -4,7 +4,7 @@ use ark_groth16::{
     Groth16, PreparedVerifyingKey as ArkPreparedVerifyingKey, Proof as ArkProof,
     VerifyingKey as ArkVerifyingKey,
 };
-use soroban_sdk::{contracttype, Vec};
+use soroban_sdk::{contracttype, vec, Env, Vec};
 
 use crate::{
     curves::{
@@ -43,6 +43,27 @@ impl VerifyingKey {
                 .collect(),
         }
     }
+
+    pub fn from_ark_vk(env: &Env, vk: ArkVerifyingKey<Bn254>) -> Self {
+        // iter doenst exist in soroban's Vec
+        let gamma_abc_g1_iter = vk
+            .gamma_abc_g1
+            .iter()
+            .map(|g1| G1Affine::from_ark_g1_affine(env, *g1));
+
+        let mut gamma_abc_g1: Vec<G1Affine> = vec![env];
+        for g1 in gamma_abc_g1_iter {
+            gamma_abc_g1.push_back(g1);
+        }
+
+        VerifyingKey {
+            alpha_g1: G1Affine::from_ark_g1_affine(env, vk.alpha_g1),
+            beta_g2: G2Affine::from_ark_g2_affine(env, vk.beta_g2),
+            gamma_g2: G2Affine::from_ark_g2_affine(env, vk.gamma_g2),
+            delta_g2: G2Affine::from_ark_g2_affine(env, vk.delta_g2),
+            gamma_abc_g1,
+        }
+    }
 }
 
 #[contracttype]
@@ -70,6 +91,15 @@ impl PreparedVerifyingKey {
             delta_g2_neg_pc,
         }
     }
+
+    // pub fn from_ark_pvk(env: &Env, pvk: ArkPreparedVerifyingKey<Bn254>) -> Self {
+    //     PreparedVerifyingKey {
+    //         vk: VerifyingKey::from_ark_vk(env, pvk.vk),
+    //         alpha_g1_beta_g2: Fp12::from_ark_fp12(env, pvk.alpha_g1_beta_g2),
+    //         gamma_g2_neg_pc: G2Affine::from_ark_g2_affine(env, pvk.gamma_g2_neg_pc),
+    //         delta_g2_neg_pc: G2Affine::from_ark_g2_affine(env, pvk.delta_g2_neg_pc),
+    //     }
+    // }
 }
 type TargetField = Fp12;
 

@@ -22,4 +22,12 @@ impl G1Projective {
             self.z.clone().to_ark_fp(),
         )
     }
+
+    pub fn from_ark_g1_projective(env: &Env, g1_projective: ArkG1Projective) -> Self {
+        G1Projective {
+            x: Fp::from_ark_fp(env, g1_projective.x),
+            y: Fp::from_ark_fp(env, g1_projective.y),
+            z: Fp::from_ark_fp(env, g1_projective.z),
+        }
+    }
 }

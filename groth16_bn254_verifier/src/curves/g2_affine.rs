@@ -1,5 +1,5 @@
 use ark_bn254::G2Affine as ArkG2Affine;
-use soroban_sdk::{contracttype, Vec};
+use soroban_sdk::{contracttype, Env, Vec};
 
 use crate::fields::fp2::Fp2;
 
@@ -13,6 +13,14 @@ pub struct G2Affine {
 impl G2Affine {
     pub fn to_ark_g2_affine(&self) -> ArkG2Affine {
         ArkG2Affine::new(self.x.clone().to_ark_fp2(), self.y.clone().to_ark_fp2())
+    }
+
+    pub fn from_ark_g2_affine(env: &Env, g2_affine: ArkG2Affine) -> Self {
+        G2Affine {
+            x: Fp2::from_ark_fp2(env, g2_affine.x),
+            y: Fp2::from_ark_fp2(env, g2_affine.y),
+            infinity: g2_affine.infinity,
+        }
     }
 }
 

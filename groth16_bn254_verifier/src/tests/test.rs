@@ -5,6 +5,9 @@ use ark_bn254::{Bn254, G1Projective};
 use ark_groth16::{Groth16, Proof};
 use ark_serialize::{CanonicalDeserialize, CanonicalSerialize};
 use risc0_groth16::{ProofJson, Seal};
+use soroban_sdk::Env;
+
+use crate::{Groth16BN254Verifier, Groth16BN254VerifierClient};
 
 use super::{
     data_structures::{PublicInputsJson, VerifyingKeyJson},
@@ -14,6 +17,10 @@ use super::{
 const TEST_VERIFICATION_KEY: &str = include_str!("data/verification_key.json");
 const TEST_PROOF: &str = include_str!("data/proof.json");
 const TEST_PUBLIC_INPUTS: &str = include_str!("data/public.json");
+
+fn create_client(e: &Env) -> Groth16BN254VerifierClient {
+    Groth16BN254VerifierClient::new(e, &e.register(Groth16BN254Verifier {}, ()))
+}
 
 #[test]
 fn test_verify() {
@@ -74,21 +81,23 @@ fn test_verify() {
         .unwrap();
     let prepared_inputs =
         &G1Projective::deserialize_uncompressed(encoded_prepared_inputs.as_slice())
-            .map_err(|err| anyhow!(err)).unwrap();
+            .map_err(|err| anyhow!(err))
+            .unwrap();
+
+    // start test
+
+    let env = Env::default();
+    env.cost_estimate().budget().reset_unlimited();
+
+    let client = create_client(&env);
+    env.cost_estimate().budget().reset_default();
+    // let res = client.verify_with_prepared_inputs(&vk, &proof, &output);
+    // assert_eq!(res, true);
+    // env.cost_estimate().budget().print();
 }
 
-// pub fn verify(&self) -> Result<(), Error> {
-//     let pvk = &PreparedVerifyingKey::deserialize_uncompressed(&*self.encoded_pvk)
-//         .map_err(|err| anyhow!(err))?;
-//     let proof =
-//         &Proof::deserialize_uncompressed(&*self.encoded_proof).map_err(|err| anyhow!(err))?;
-//     let prepared_inputs =
-//         &G1Projective::deserialize_uncompressed(self.encoded_prepared_inputs.as_slice())
-//             .map_err(|err| anyhow!(err))?;
-//     match Groth16::<Bn254>::verify_proof_with_prepared_inputs(pvk, proof, prepared_inputs)
-//         .map_err(|err| anyhow!(err))?
-//     {
-//         true => Ok(()),
-//         false => Err(anyhow!("Invalid proof")),
-//     }
-// }
+// pub fn verify_with_prepared_inputs(
+//     pvk_soroban: PreparedVerifyingKeySoroban,
+//     proof_soroban: ProofSoroban,
+//     prepared_inputs_soroban: G1ProjectiveSoroban,
+
