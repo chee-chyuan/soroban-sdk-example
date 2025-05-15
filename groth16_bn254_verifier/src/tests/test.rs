@@ -24,7 +24,8 @@ const TEST_VERIFICATION_KEY: &str = include_str!("data/verification_key.json");
 const TEST_PROOF: &str = include_str!("data/proof.json");
 const TEST_PUBLIC_INPUTS: &str = include_str!("data/public.json");
 
-const TEST_VERIFICATION_KEY_MULTIPLIER: &str = include_str!("data_multiplier/verification_key.json");
+const TEST_VERIFICATION_KEY_MULTIPLIER: &str =
+    include_str!("data_multiplier/verification_key.json");
 const TEST_PROOF_MULTIPLIER: &str = include_str!("data_multiplier/proof.json");
 const TEST_PUBLIC_INPUTS_MULTIPLIER: &str = include_str!("data_multiplier/public.json");
 
@@ -113,11 +114,10 @@ fn test_verify_risc0_proof() {
     env.cost_estimate().budget().print();
 }
 
-
-
 #[test]
 fn test_verify_multiplier_proof() {
-    let verifying_key: VerifyingKeyJson = serde_json::from_str(TEST_VERIFICATION_KEY_MULTIPLIER).unwrap();
+    let verifying_key: VerifyingKeyJson =
+        serde_json::from_str(TEST_VERIFICATION_KEY_MULTIPLIER).unwrap();
     let proof: ProofJson = serde_json::from_str(TEST_PROOF_MULTIPLIER).unwrap();
     let public_inputs = PublicInputsJson {
         values: serde_json::from_str(TEST_PUBLIC_INPUTS_MULTIPLIER).unwrap(),
@@ -195,7 +195,3 @@ fn test_verify_multiplier_proof() {
     assert_eq!(res, true);
     env.cost_estimate().budget().print();
 }
-// pub fn verify_with_prepared_inputs(
-//     pvk_soroban: PreparedVerifyingKeySoroban,
-//     proof_soroban: ProofSoroban,
-//     prepared_inputs_soroban: G1ProjectiveSoroban,
