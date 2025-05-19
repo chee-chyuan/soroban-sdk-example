@@ -19,3 +19,24 @@ fn test() {
         ]
     );
 }
+
+
+
+
+// stellar contract upload \
+//   --network testnet \
+//   --source SBQZIRY4U6HEWA7INGHM2ZJIUZ2NUOUEAKEQQKV67GYD4S2WWAW66GDY \
+//   --wasm target/wasm32-unknown-unknown/release/soroban_hello_world_contract.wasm 
+
+// wasm hash
+// fec2819684a9c2964614b769ef881c66848af7ef0eabf1ddb968fc0fef36b11e
+
+// stellar contract deploy \
+//   --wasm-hash fec2819684a9c2964614b769ef881c66848af7ef0eabf1ddb968fc0fef36b11e \
+//   --source SBQZIRY4U6HEWA7INGHM2ZJIUZ2NUOUEAKEQQKV67GYD4S2WWAW66GDY \
+//   --network testnet \
+//   --alias hello_world_test
+
+// contract id
+// https://stellar.expert/explorer/testnet/contract/CCR7I27QJNKRAQOIR6L2GRDPEBJP64CCQFGXXSXOQCQGY7K6X7DRMRKN
+// CCR7I27QJNKRAQOIR6L2GRDPEBJP64CCQFGXXSXOQCQGY7K6X7DRMRKN

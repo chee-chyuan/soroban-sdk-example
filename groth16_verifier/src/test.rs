@@ -97,3 +97,35 @@ fn test() {
     assert_eq!(res, true);
     env.cost_estimate().budget().print();
 }
+
+
+
+// stellar contract upload \
+//   --network testnet \
+//   --source alice \
+//   --wasm target/wasm32-unknown-unknown/release/soroban_increment_contract.wasm
+
+
+
+// stellar contract upload \
+//   --network testnet \
+//   --source SBQZIRY4U6HEWA7INGHM2ZJIUZ2NUOUEAKEQQKV67GYD4S2WWAW66GDY \
+//   --wasm target/wasm32-unknown-unknown/release/soroban_groth16_verifier_contract.wasm 
+// wasm hash
+// 76fd52f3945a16af663c86b4e771168449c39de6068dd9d7e9ea78931782614a
+
+// stellar contract deploy \
+//   --wasm-hash 76fd52f3945a16af663c86b4e771168449c39de6068dd9d7e9ea78931782614a \
+//   --source SBQZIRY4U6HEWA7INGHM2ZJIUZ2NUOUEAKEQQKV67GYD4S2WWAW66GDY \
+//   --network testnet \
+//   --alias groth16_verifier_bls12_381
+
+// contract id
+// https://stellar.expert/explorer/testnet/contract/CBFKQXK7OTS7QGUS72IQGZC6POUJW47NVLZZDEJAVESLWD3ZTGCFHB57
+// CBFKQXK7OTS7QGUS72IQGZC6POUJW47NVLZZDEJAVESLWD3ZTGCFHB57
+
+
+// stellar contract bindings typescript \
+//   --network testnet \
+//   --contract-id hello_world \
+//   --output-dir packages/hello_world

@@ -195,3 +195,32 @@ fn test_verify_multiplier_proof() {
     assert_eq!(res, true);
     env.cost_estimate().budget().print();
 }
+
+
+
+
+
+
+// stellar contract upload \
+//   --network testnet \
+//   --source SBQZIRY4U6HEWA7INGHM2ZJIUZ2NUOUEAKEQQKV67GYD4S2WWAW66GDY \
+//   --wasm target/wasm32-unknown-unknown/release/soroban_groth16_bn254_verifier_contract.wasm 
+
+// wasm hash
+// 0a607c9efe9022fb5088a56b88127a50e5bdc6acd34408d1dfa18bcf7c9a8a51
+
+// stellar contract deploy \
+//   --wasm-hash 0a607c9efe9022fb5088a56b88127a50e5bdc6acd34408d1dfa18bcf7c9a8a51 \
+//   --source SBQZIRY4U6HEWA7INGHM2ZJIUZ2NUOUEAKEQQKV67GYD4S2WWAW66GDY \
+//   --network testnet \
+//   --alias groth16_verifier_bn254
+
+// contract id
+// https://stellar.expert/explorer/testnet/contract/CD2MSG6X4FHAA5UKE2QJLEM53IMPYGWCK2C2KHNEPUB6GFUXPZ4M345K
+// CD2MSG6X4FHAA5UKE2QJLEM53IMPYGWCK2C2KHNEPUB6GFUXPZ4M345K
+
+
+// stellar contract bindings typescript \
+//   --network testnet \
+//   --contract-id hello_world \
+//   --output-dir packages/hello_world
