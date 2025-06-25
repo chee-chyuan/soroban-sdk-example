@@ -16,14 +16,11 @@ ark-ff = { version = "0.5.0", default-features = false }
 ark-groth16 = { version = "0.5.0", default-features = false }
 ark-ec = { version = "0.5.0", default-features = false }
 # soroban-sdk = { version = "22.0.1" }
-soroban-sdk = { git = "https://github.com/jayz22/rs-soroban-sdk.git", rev = "183f527a763ae12611870fd16724b89e5e40ad33" }
+soroban-sdk = { version = "22.0.7", features = ["alloc"] }
 wee_alloc = "0.4.5"
 
 [dev-dependencies]
-# soroban-sdk = { version = "22.0.1", features = ["testutils"] }
-soroban-sdk = { git = "https://github.com/jayz22/rs-soroban-sdk.git", rev = "183f527a763ae12611870fd16724b89e5e40ad33", features = [
-    "testutils",
-] }
+soroban-sdk = { version = "22.0.7", features = ["testutils", "alloc"] }
 risc0-groth16 = "2.0.1"
 serde = { version = "1.0", default-features = false, features = [
     "alloc",
